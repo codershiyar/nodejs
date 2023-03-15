@@ -1,19 +1,31 @@
-let express = require("express")
+const express = require("express")
+const bodyParser = require("body-parser")
 let app = express();
 app.listen(3000)
 
-app.get("/", function(request, respone){
+app.use(express.static("public"))
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
+
+app.get("/api/:name/:age", function(request, respone){
+    console.log(request.params)
     respone.json({"Name": "Coder Shiyar"})
     // respone.send("مسار يعمل")
 })
 
+app.post("/api", function(request, respone){
+    respone.json({"method": "post test"})
+    // respone.send("مسار يعمل")
+})
 
+app.get("/", function(request, respone){  
+    respone.sendFile("index.html")
+    // respone.sendFile(__dirname+ "/public/index.html")
+})
 
-
-
-
-
-
+app.get("*",function(request, respone){  
+   respone.send("صفحة لا يتواجد")
+})
 
 
 // Express.js, is a back end web application framework, it is
@@ -39,9 +51,6 @@ app.get("/", function(request, respone){
 
 
 
-
-
-
 // var bodyParser = require("body-parser");
 // app.listen(3000)
 // app.use(bodyParser.json());
@@ -62,3 +71,16 @@ app.get("/", function(request, respone){
 //     console.log(request.body)
 //     respone.json({"name": "Coder Shiyar"})
 // })
+
+
+
+// GET      Read
+// POST     Create
+// PUT      Update/Replace	
+// DELETE	Delete	
+// ------------------------------
+// Status codes: 
+// 200 (OK)
+// 201 (Created),
+// 405 (Method Not Allowed)
+// ------------------------------
