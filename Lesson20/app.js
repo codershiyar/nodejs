@@ -1,36 +1,25 @@
-const mysql = require('mysql');
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'shiyar_courses'
- }); 
-
- connection.connect((error) => {
-  if (error) {
-    console.error('Error connecting to MySQL database:', error);
-    return;
-  }
-  console.log('Connected to MySQL database!');
+// EJS (Embedded JavaScript) 
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+// استخدام body-parser لقراءة البيانات المرسلة عبر طرق POST
+app.use(bodyParser.urlencoded({ extended: true }));
+// معالجة طلب POST للمسار '/submit-data'
+app.post('/submit-data', (req, res) => {
+  res.render('response',{responseMessage: req.body});
 });
-
-
-connection.query('SELECT Name FROM course WHERE ID =? OR ID =?',[11,12], (error, results) => {
-  if (error) {
-    console.error('Error executing query:', error);
-    return;
-  }
-  console.log('Query results:', results);
-  results.forEach(result => {
-    console.log(result.Name)
-  });
+app.get('/test', (req, res) => {
+  res.render('conditional', { age: 14 });
 });
-
-
-connection.end((error) => {
-  if (error) {
-    console.error('Error closing connection:', error);
-    return;
-  }
-  console.log('Connection closed.');
+app.get('/foreach', (req, res) => {
+  res.render('foreach', { items: ['Apple', 'Banana', 'Cherry'] });
 });
+// تعيين ejs كمحرك القالب
+app.set('view engine', 'ejs');
+// استخدام مجلد "public" للملفات الثابتة
+app.use(express.static('public'));
+app.get('/', (req, res) => {
+  res.render('index', { title: 'صفحة البداية', message: 'مرحبًا بكم في تطبيقنا الرائع' });
+});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => { console.log(`${PORT}`);});

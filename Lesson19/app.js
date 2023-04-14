@@ -1,33 +1,36 @@
-// Event                      (حدث (حدث/شيء معين يحدث 
-// Emitter                                        مرسل
-// EventEmitter                            مرسل الأحداث
-// ----------------------------------------------------
-// Emit                           (إرسال | (إطلاق الحدث
-const EventEmitter = require("events");
-let myEmitter = new EventEmitter();
+const mysql = require('mysql');
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'shiyar_courses'
+ }); 
 
-myEmitter.on("change", function(data){
-    console.log(data)
+ connection.connect((error) => {
+  if (error) {
+    console.error('Error connecting to MySQL database:', error);
+    return;
+  }
+  console.log('Connected to MySQL database!');
 });
 
-setInterval(() => {
-   myEmitter.emit("change", new Date().toLocaleString()) 
-}, 1000);
 
-// myEmitter.on("update",(data)=>{
-//     console.log("تم اطلاق الحدث", data)
-// } );
+connection.query('SELECT Name FROM course WHERE ID =? OR ID =?',[11,12], (error, results) => {
+  if (error) {
+    console.error('Error executing query:', error);
+    return;
+  }
+  console.log('Query results:', results);
+  results.forEach(result => {
+    console.log(result.Name)
+  });
+});
 
-// myEmitter.emit("update","Coder Shiyar")
 
-// let listener=(data)=>{
-//     console.log("تم اطلاق الحدث", data)
-// };
-// myEmitter.on("update",listener );
-
-// setTimeout(() => {
-//     myEmitter.removeListener("update", listener);
-//     myEmitter.emit("update","test")
-// }, 3000);
-
-// myEmitter.emit("update","Coder Shiyar")
+connection.end((error) => {
+  if (error) {
+    console.error('Error closing connection:', error);
+    return;
+  }
+  console.log('Connection closed.');
+});
