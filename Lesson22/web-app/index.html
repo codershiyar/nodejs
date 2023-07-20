@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+</head>
+<body>
+    <header>
+        <section id="Alert" class="alert"></section>
+    </header>
+    <main class="container mt-3">
+        <label for="Name">Name</label>
+        <input type="text" id="Name" class="form-control mb-3">
+        <label for="Email">Email</label>
+        <input type="email" id="Email" class="form-control mb-3">
+        <label for="Password">Password</label>
+        <input type="text" id="Password" class="form-control mb-3">
+        <button onclick="Create()" type="button" class="btn btn-dark w-100">Create</button>
+    <section id="Users">
+
+    </section>
+    </main>
+    
+    <script>
+        let Alert = document.getElementById("Alert")
+        function Create(){
+            fetch("http://localhost:3000/users", {
+            method:"POST",
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                Name: document.getElementById("Name").value, 
+                Email:document.getElementById("Email").value, 
+                Password:document.getElementById("Password").value
+            })
+        }).then(Request => Request.json()).then(Answer=>{
+            ShowAlert(Answer)
+            GetData()
+        })
+        }
+        GetData()
+       function GetData(){
+        fetch("http://localhost:3000/users",{
+            method:"GET"
+        }).then(Request => Request.json())
+        .then(Users=>{
+            ShowData(Users)
+        })
+        }
+        
+        function ShowData(Users){
+            let Table = `<table class="table">`
+                Table+= `<tr> 
+                            <th>Name</th> 
+                            <th>Email</th> 
+                            <th>Password</th> 
+                            <th style="color:red;">Delete</th>
+                            <th style="color:dark;">Update</th>
+                         </tr>` 
+                Users.forEach(User => {
+                    Table+= `<tr> 
+                                <td contenteditable id="Name${User.Id}">${User.Name}</td> 
+                                <td contenteditable id="Email${User.Id}">${User.Email}</td> 
+                                <td contenteditable id="Password${User.Id}">${User.Password}</td> 
+                                <td onclick="Remove(${User.Id})"><button class="btn btn-danger">x</button> </td>
+                                <td onclick="Update(${User.Id})"><img src="update.png" width="45"></td>  
+                            </tr>`  
+                });
+            Table+=` </table>`
+            document.getElementById("Users").innerHTML = Table
+        }
+
+        function Remove(Id){
+            fetch(`http://localhost:3000/users/${Id}`, {
+            method:"DELETE"
+        }).then(Request => Request.json()).then(Answer=>{
+            ShowAlert(Answer); GetData();
+        })
+        }
+
+        function Update(Id){
+            fetch(`http://localhost:3000/users/${Id}`, {
+            method:"PUT",
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify(
+                {
+                    Name: document.getElementById("Name"+Id).innerText, 
+                    Email:document.getElementById("Email"+Id).innerText, 
+                    Password:document.getElementById("Password"+Id).innerText
+                }
+            )
+        }).then(Request => Request.json()).then(Answer=>{
+            ShowAlert(Answer); GetData();
+        })
+        }
+        
+        function ShowAlert(Answer){
+            Alert.classList.add(Answer.Success? "alert-success" : "alert-danger")
+            Alert.innerText = Answer.Message
+        }
+    </script>
+</body>
+</html>
